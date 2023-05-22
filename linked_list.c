@@ -1,14 +1,4 @@
-#ifndef LINKED_LIST_H
-#define LINKED_LIST_H
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include "node.h"
-
-typedef struct LinkedList {
-    Node* head;
-} LinkedList;
+#include "linked_list.h"
 
 LinkedList* init_linked_list(){
     LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
@@ -33,7 +23,4 @@ void insert_in_list(LinkedList* list, void* data_ptr){
         //append node to list
         next->next = node;
     }
-    
 }
-
-#endif

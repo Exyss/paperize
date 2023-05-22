@@ -22,14 +22,24 @@ typedef struct Row{
 typedef struct Word{
     char* str;
     int char_count;
+    bool REACHED_EOL;
+    bool REACHED_EOF;
 } Word;
 
-Page* init_page(int MAX_COLS);
+Page* init_page();
 
 Column* init_column(int MAX_ROWS);
 
 Row* init_row(int MAX_CHARS);
 
-Word* init_word(char* str, int char_count);
+Word* init_word(char* str, int char_count, bool REACHED_EOL, bool REACHED_EOF);
+
+void destroy_word(Word* word);
+
+void destroy_row(Row* row);
+
+void destroy_column(Column* column);
+
+void destroy_page(Page* page);
 
 #endif

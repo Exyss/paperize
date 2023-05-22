@@ -1,13 +1,4 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include "node.h"
-
-typedef struct Queue {
-    Node* head;
-    Node* tail;
-    int size;
-    int MAX_SIZE;
-} Queue;
+#include "queue.h"
 
 Queue* init_queue(int MAX_SIZE){
 
@@ -31,6 +22,16 @@ int queue_size(Queue* queue){
 
 bool is_queue_full(Queue* queue){
     return (queue->size == queue->MAX_SIZE);
+}
+
+//MUST BE HANDLED CAREFULLY
+void* peek_queue(Queue* queue){
+    if(!is_queue_empty(queue)){
+        return queue->head->data_ptr;
+    }
+    else{
+        return NULL;
+    }
 }
 
 //Sets status to false in case max limit has been reached

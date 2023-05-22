@@ -10,7 +10,7 @@ compile: precompile
 	$(info +++ Compiling project...)
 	$(CC) $(CFLAGS) -O3 *.o -o paperize
 
-precompile: structs data_structs io_modules  main
+precompile:  main data_structs core
 
 main: main.c
 	$(info )
@@ -19,20 +19,19 @@ main: main.c
 
 data_structs: node.c queue.c linked_list.c
 	$(info )
-	$(info +++ Pre-compiling data structures...)
+	$(info +++ Pre-compiling data structs modules...)
 	gcc -c node.c -o node.o
 	gcc -c queue.c -o queue.o
 	gcc -c linked_list.c -o linked_list.o
 
-io_modules: file_reader.c file_writer.c
+core: reader.c pager.c writer.c structs.c string_utils.c
 	$(info )
-	$(info +++ Pre-compiling I/O modules...)
-	gcc -c file_reader.c -o file_reader.o
-	gcc -c file_writer.c -o file_writer.o
-
-structs: structs.c
-	$(info +++ Pre-compiling program structs...)
+	$(info +++ Pre-compiling core modules...)
+	gcc -c reader.c -o reader.o
+	gcc -c pager.c -o pager.o
+	gcc -c writer.c -o writer.o
 	gcc -c structs.c -o structs.o
+	gcc -c string_utils.c -o string_utils.o
 
 clean:
 	$(info )

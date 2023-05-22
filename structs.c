@@ -1,25 +1,4 @@
-#include <limits.h>
-#include "queue.h"
-#include "linked_list.h"
-
-typedef struct Page{
-    LinkedList* columns;
-} Page;
-
-typedef struct Column{
-    Queue* rows;
-} Column;
-
-typedef struct Row{
-    Queue* words;
-    int char_count;
-    int MAX_CHARS;
-} Row;
-
-typedef struct Word{
-    char* str;
-    int char_count;
-} Word;
+#include "structs.h"
 
 Page* init_page(){
     Page* page = (Page*) malloc(sizeof(Page));
@@ -41,9 +20,62 @@ Row* init_row(int MAX_CHARS){
     return row;
 }
 
-Word* init_word(char* str, int char_count){
+Word* init_word(char* str, int char_count, bool REACHED_EOL, bool REACHED_EOF){
     Word* word = (Word*) malloc(sizeof(Word));
     word->str = str;
     word->char_count = char_count;
+    word->REACHED_EOL = REACHED_EOL;
+    word->REACHED_EOF = REACHED_EOF;
     return word;
+}
+
+void destroy_word(Word* word){
+    free(word->str);
+    free(word);
+}
+
+void destroy_row(Row* row){
+    Word* word;
+    bool q_status;
+
+    while(!is_queue_empty(row->words)){
+        word = (Word*) dequeue(row->words, &q_status);
+        destroy_word(word);
+    }
+
+    free(row->words);
+    free(row);
+}
+
+void destroy_column(Column* column){
+    Row* row;
+    bool q_status;
+
+    while(!is_queue_empty(column->rows)){
+        row = (Row*) dequeue(column->rows, &q_status);
+        destroy_row(row);
+    }
+    
+    free(column->rows);
+    free(column);
+}
+
+void destroy_page(Page* page){
+    Column* column;
+
+    LinkedList* columns = (LinkedList*) page->columns;
+    Node* node = (Node*) columns->head;
+    Node* tmp;
+
+    while(node != NULL){
+        column = (Column*) node->data_ptr;
+        destroy_column(column);
+
+        tmp = node->next;
+        free(node);
+        node = tmp; 
+    }
+    
+    free(page->columns);
+    free(page);
 }

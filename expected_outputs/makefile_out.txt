@@ -1,0 +1,19 @@
+CC := gcc                 ROOT_DIR := src           $(ROOT_DIR)/%.c,
+                                                    $(OBJ_DIR)/%.o, 
+TARGET        :=          SOURCES       :=          $(SOURCES))     
+newspaper                 $(wildcard                                
+                          $(ROOT_DIR)/*.c)          all:        dirs
+OBJ_DIR       :=                                    $(TARGET)       
+objdir                    OBJECTS       :=                          
+                          $(patsubst                dirs:           
+
+%%%
+
+                          $@                                        
+@mkdir        -p                                    @rm          -rf
+$(OBJ_DIR)                $(TARGET):                $(OBJ_DIR)      
+                          $(OBJECTS)                $(TARGET)       
+$(OBJ_DIR)/%.o:                                                     
+$(ROOT_DIR)/%.c           $(CC) $^ -o $@            .PHONY:  all dir
+                                                    clean
+$(CC)  -c  $< -o          clean:          
