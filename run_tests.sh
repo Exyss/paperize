@@ -24,17 +24,16 @@ run_test() {
         echo "not passed ❌"
     fi
 
-    wc output.txt
-    wc $2
-
+    # wc output.txt
+    # wc $2
+    # sleep 1
+    
     let TOTAL_TESTS++
 
-    sleep 1
 }
 
 # non-parallel tests
 run_test sample_inputs/utf8_prof_in.txt expected_outputs/utf8_prof_out.txt 3 40 21 10 false
-exit
 run_test sample_inputs/lorem_long_in.txt expected_outputs/lorem_long_out.txt 3 40 21 10 false
 run_test sample_inputs/lorem_short_in.txt expected_outputs/lorem_short_out.txt 3 4 5 1 false
 run_test sample_inputs/capo_in.txt expected_outputs/capo_out.txt 3 7 15 1 false
@@ -50,6 +49,7 @@ run_test sample_inputs/example3_in.txt expected_outputs/example3_out.txt 3 5 15 
 run_test sample_inputs/example4_in.txt expected_outputs/example4_out.txt 200 5 15 5 false
 run_test sample_inputs/ionut_in.txt expected_outputs/ionut_out.txt 3 40 60 10 false
 run_test sample_inputs/dante_in.txt expected_outputs/dante_out.txt 5 40 20 5 false
+exit
 
 echo ""
 

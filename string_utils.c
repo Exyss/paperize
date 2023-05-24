@@ -1,5 +1,8 @@
 #include "string_utils.h"
 
+/*
+    Right-pads the given string with pad_amount spaces
+*/
 char* right_pad_string(char* str, int pad_amount){
 
     int str_len = strlen(str);
@@ -18,6 +21,9 @@ char* right_pad_string(char* str, int pad_amount){
     return padded_str;
 }
 
+/*
+    Left-pads the given string with pad_amount spaces
+*/
 char* left_pad_string(char* str, int pad_amount){
     int str_len = strlen(str);
     int byte_count = str_len + pad_amount + 1;      // the final \0 must be included

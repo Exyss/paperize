@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     }
 
     const char* INPUT_FILE = argv[1];
-    const char* OUTPUT_FILE;
+    char* OUTPUT_FILE;
     const int COLUMN_AMOUNT = atoi(argv[2]);
     const int COLUMN_HEIGHT = atoi(argv[3]);
     const int COLUMN_WIDTH = atoi(argv[4]);

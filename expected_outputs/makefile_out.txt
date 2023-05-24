@@ -9,11 +9,11 @@ objdir                    OBJECTS       :=
 
 %%%
 
-                          $@                                        
-@mkdir        -p                                    @rm          -rf
-$(OBJ_DIR)                $(TARGET):                $(OBJ_DIR)      
-                          $(OBJECTS)                $(TARGET)       
-$(OBJ_DIR)/%.o:                                                     
-$(ROOT_DIR)/%.c           $(CC) $^ -o $@            .PHONY:  all dir
-                                                    clean
-$(CC)  -c  $< -o          clean:          
+@mkdir        -p          $(TARGET):                $(OBJ_DIR)      
+$(OBJ_DIR)                $(OBJECTS)                $(TARGET)       
+                                                                    
+$(OBJ_DIR)/%.o:           $(CC) $^ -o $@            .PHONY: all  dir
+$(ROOT_DIR)/%.c                                     clean           
+                          clean:          
+$(CC) -c  $<  -o                          
+$@                        @rm          -rf

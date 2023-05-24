@@ -14,7 +14,8 @@ static Row* read_row(FILE* fin, int MAX_CHARS){
     Word* next_word;
 
     int char_count;
-    bool q_status;
+    short q_status;
+    short read_status;
 
     row = init_row(MAX_CHARS);
 
@@ -26,7 +27,7 @@ static Row* read_row(FILE* fin, int MAX_CHARS){
             USE_LAST_WORD = false;
         }
         else{
-            next_word = read_word(fin, MAX_CHARS);
+            next_word = read_word(fin, MAX_CHARS, &read_status);
 
             //avoid reading \n followed by \n
             if(last_word != NULL && next_word->char_count == 0
@@ -66,7 +67,7 @@ static Column* read_column(FILE* fin, int MAX_ROWS, int MAX_CHARS){
     
     Column* column = init_column(MAX_ROWS);
     Row* next_row;
-    bool q_status;
+    short q_status;
     
     while(!REACHED_EOF){
         
@@ -79,10 +80,12 @@ static Column* read_column(FILE* fin, int MAX_ROWS, int MAX_CHARS){
             next_row = read_row(fin, MAX_CHARS);
         }
         
+        //store row
         last_row = next_row;
 
         if(is_queue_full(column->rows)){
             USE_LAST_ROW = true;
+            REACHED_EOF = false;
             break;
         }
 
@@ -114,7 +117,7 @@ static Page* read_page(FILE* fin, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
     
     Page* page = init_page(MAX_COLS);
     Column* col;
-    bool q_status;
+    short q_status;
     int col_count = 0;
 
     while(!REACHED_EOF && col_count < MAX_COLS){
@@ -131,7 +134,7 @@ Queue* read_pages(const char* in_filename, int COLUMN_AMOUNT, int COLUMN_HEIGHT,
     FILE* fin;
     Queue* pages;
     Page* page; 
-    bool q_status;
+    short q_status;
 
     pages = init_queue(INT_MAX);
 

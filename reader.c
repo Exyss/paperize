@@ -1,25 +1,32 @@
 #include "reader.h"
 
-typedef unsigned short int u16;
+/*
+    Analyzes next_byte in order to calculate
+    how many more bytes make up the current
+    character.
+    Returns 0 if it's an ASCII char,
+    1, 2 or 3 if it's an UTF-8 char
+*/
+static short get_bytes_to_read(int next_byte){
 
-static u16 get_bytes_to_read(int next_byte){
-
-    //the first 2 MS bits of the byte are used to 
-    //determinate if it's an ASCII char or if
-    //it's part of UTF-8 char
-    //  =>  if the bits are set to 0xxxxxxx,
-    //      it's an ASCII char
-    //  =>  if the bits are set to 11xxxxxx,
-    //      it's the first byte of an UTF-8 char
-    //  =>  if the bits are set to 10xxxxxx,
-    //      it's the next byte of an UTF-8 char
-    
-    u16 bytes_to_read = 0;
+    /*
+        The first 2 MS bits of the byte are used to 
+        determinate if it's an ASCII char or if
+        it's part of UTF-8 char
+        =>  if the bits are set to 0xxxxxxx,
+            it's an ASCII char
+        =>  if the bits are set to 11xxxxxx,
+            it's the first byte of an UTF-8 char
+        =>  if the bits are set to 10xxxxxx,
+            it's the next byte of an UTF-8 char
+    */
+   
+    short bytes_to_read = 0;
     
     //if it's the first byte of an UTF-8 char
     if((next_byte >> 6) == 0b11 ){
 
-        //the first 4 MS bits of the char are used 
+        //the first 5 MS bits of the char are used 
         //to determinate how many bytes form the UTF-8 char
         switch(next_byte & 0b11110000){
             
@@ -35,6 +42,10 @@ static u16 get_bytes_to_read(int next_byte){
                 bytes_to_read = 3;
                 break;
 
+            case 0b11111000:
+                bytes_to_read = 4;
+                break;
+
             default:
                 break;
         }
@@ -43,15 +54,22 @@ static u16 get_bytes_to_read(int next_byte){
     return bytes_to_read;
 }
 
+/*
+    Creates and fills a Word with the given data.
+    The given max-size stack buffer gets coverted
+    to a perfect-sized heap buffer.
+*/
 static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHED_EOL, bool REACHED_EOF){
     
     //signal word end for strcpy (see below)
     buffer[byte_count] = '\0';
     byte_count++;
 
-    //strcpy stops copying after reading the first \0
-    //    => we get a perfect sized string in the heap
-    //       while the bloated string in stack gets reused
+    /*
+        strcpy stops copying after reading the first \0
+        => we get a perfect sized string in the heap
+            while the bloated string in stack gets reused
+    */
     char* str = (char*) malloc(byte_count);
     strcpy(str, buffer);
 
@@ -59,13 +77,23 @@ static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHE
     return word;
 }
 
-Word* read_word(FILE* fin, int MAX_CHARS){
+/*
+    Reads the file byte-by-byte until a full
+    Word has been created (until a '\n',
+    a ' ' or a '\t' gets read or until
+    MAX_CHARS have been read).
+    Sets status to READ_SUCCESS or READ_FAIL.
+*/
+Word* read_word(FILE* fin, int MAX_CHARS, short* status){
     
-    //worst case: all row chars are UTF-8 (max 4 bytes per UTF-8 char), +1 for \0
-    //   => using a "big" buffer is preferable to continuously using malloc()
-    //      in order to append characters since it would impact on performance
-    //      due to too much malloc() and free() calls (also, the stack gets
-    //      cleared once a word has been read, meaning the same bytes would be reused)
+    /*
+    worst case: all row chars are UTF-8 (max 4 bytes per UTF-8 char), +1 for \0
+        => using a "big" buffer is preferable to continuously using malloc()
+            in order to append characters since it would impact on performance
+            due to too much malloc() and free() calls (also, the stack gets
+            cleared once a word has been read, meaning the same bytes would be reused)
+    */
+    
     const int MAX_BUFFER = MAX_CHARS * 4 + 1;
 
     char buffer[MAX_BUFFER];
@@ -75,7 +103,7 @@ Word* read_word(FILE* fin, int MAX_CHARS){
 
     int char_count = 0;
     int byte_count = 0;
-    u16 bytes_to_read = 0;
+    short bytes_to_read = 0;
 
     bool REACHED_EOL = false;
     bool REACHED_EOF = false;
@@ -125,9 +153,20 @@ Word* read_word(FILE* fin, int MAX_CHARS){
         }
     }
 
+    /*
+        EOF is returned when end of file has been reached
+        or when an error occurred
+        => must check if an error occurred
+    */
+    if(ferror(fin) != 0){
+        *status = READ_FAIL;
+        return NULL;
+    }
+
     //check if EOF has been reached
     REACHED_EOF = (next_byte == EOF);
 
     Word* word = pack_word(buffer, byte_count, char_count, REACHED_EOL, REACHED_EOF);
+    *status = READ_SUCCESS;
     return word;
 }

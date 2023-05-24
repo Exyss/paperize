@@ -1,12 +1,34 @@
 #include "writer.h"
 
+/*
+    Writes the given string on the given file.
+    Sets status to WRITE_SUCCESS or WRITE_FAIL
+*/
+void write_to_file(FILE* fout, char* str, short* status){
+    fprintf(fout, "%s", str);
+
+    //check write error
+    if(ferror(fout) != 0){
+        *status = WRITE_FAIL;
+    }
+    else{
+        *status = WRITE_SUCCESS;
+    }
+}
+
+/*
+    Write the given row on the given file
+    without justified alignment
+*/
 void write_unjustified_col_row(FILE* fout, Row* row){
 
     Word* word;
     int words_count;
     int remaining_space;
-    bool q_status;
 
+    short q_status;
+    short write_status;
+    
     words_count = queue_size(row->words);
     remaining_space = row->MAX_CHARS - row->char_count;
 
@@ -31,6 +53,10 @@ void write_unjustified_col_row(FILE* fout, Row* row){
 }
 
 
+/*
+    Write the given row on the given file
+    with justified alignment
+*/
 void write_justified_col_row(FILE* fout, Row* row){
 
     Word* word;
@@ -40,7 +66,7 @@ void write_justified_col_row(FILE* fout, Row* row){
     int next_space;
     int excess_space;
 
-    bool q_status;
+    short q_status;
 
     words_count = queue_size(row->words);
     remaining_space = row->MAX_CHARS - row->char_count;
@@ -71,10 +97,14 @@ void write_justified_col_row(FILE* fout, Row* row){
     destroy_word(word);
 }
 
+/*
+    Writes the given column row on the given file
+    using the given INTER_COL_SPACE (space between each column)
+*/
 void write_column_row(FILE* fout, Row* row, int INTER_COL_SPACE, bool DO_NOT_JUSTIFY){
 
     Word* word;
-    bool q_status;
+    short q_status;
     int words_count;
 
     words_count = queue_size(row->words);
@@ -94,16 +124,23 @@ void write_column_row(FILE* fout, Row* row, int INTER_COL_SPACE, bool DO_NOT_JUS
     destroy_row(row);
 }
 
-bool write_page_row(FILE* fout, LinkedList* columns, int INTER_COL_SPACE){
+/*
+    Writes a row from each column of the given column list
+    using the given INTER_COL_SPACE (space between each column)
+*/
+bool write_page_row(FILE* fout, LinkedList* columns, int INTER_COL_SPACE, bool IS_LAST_PAGE){
+    Node* head;
     Node* node;
     Column* col;
     Row* curr_row;
+    Row* next_row;
 
-    bool q_status;
+    short q_status;
     bool all_columns_empty;
     bool DO_NOT_JUSTIFY;
 
-    node = columns->head;
+    head = columns->head;
+    node = head;
     all_columns_empty = true;
 
     while(node != NULL){
@@ -112,23 +149,30 @@ bool write_page_row(FILE* fout, LinkedList* columns, int INTER_COL_SPACE){
         if(!is_queue_empty(col->rows)){
             all_columns_empty = false;
 
-            curr_row = (Row*) dequeue(col->rows, &q_status);
+            //write inter column spacing on the left only if it's not the first column
+            if(node != head){
+                fprintf(fout, "%s", right_pad_string("", INTER_COL_SPACE));
+            }
 
-            if(!is_queue_empty(col->rows)){
-                
+            curr_row = (Row*) dequeue(col->rows, &q_status);
+            next_row = (Row*) peek_queue(col->rows);    //peek doesn't dequeue
+
+            //if there is another row
+            if(next_row != NULL){
                 //do not justify if the next row is empty
-                DO_NOT_JUSTIFY = (((Row*) peek_queue(col->rows))->char_count == 0);
+                DO_NOT_JUSTIFY = ((next_row)->char_count == 0);
             }
             else{
-                DO_NOT_JUSTIFY = false;
+                //if it's the last row of the last column of the last page
+                if(node->next == NULL && IS_LAST_PAGE){
+                    DO_NOT_JUSTIFY = true;
+                }
+                else{
+                    DO_NOT_JUSTIFY = false;
+                }
             }
 
             write_column_row(fout, curr_row, INTER_COL_SPACE, DO_NOT_JUSTIFY);
-        }
-
-        //write inter column spacing only if it's not the last column
-        if(node->next != NULL){
-            fprintf(fout, "%-*s", INTER_COL_SPACE, "");
         }
 
         node = node->next;
@@ -141,13 +185,18 @@ bool write_page_row(FILE* fout, LinkedList* columns, int INTER_COL_SPACE){
     return all_columns_empty;
 }
 
-int write_pages(const char* out_filename, Queue* pages, int INTER_COL_SPACE){
+/*
+    Writes all the given pages on the given file
+    using the given INTER_COL_SPACE (space between each column)
+*/
+int write_pages(char* out_filename, Queue* pages, int INTER_COL_SPACE){
 
     FILE* fout;
     Page* page;
 
-    bool q_status;
+    short q_status;
     bool all_columns_empty;
+    bool is_last_page;
 
     //open output file
     if ((fout = fopen(out_filename, "w")) == NULL) {
@@ -159,22 +208,25 @@ int write_pages(const char* out_filename, Queue* pages, int INTER_COL_SPACE){
         page = (Page*) dequeue(pages, &q_status);
 
         all_columns_empty = false;
+        is_last_page = is_queue_empty(pages);
 
         while(!all_columns_empty){
-            all_columns_empty = write_page_row(fout, page->columns, INTER_COL_SPACE);
+            all_columns_empty = write_page_row(fout, page->columns, INTER_COL_SPACE, is_last_page);
         }
         
-        if(!is_queue_empty(pages)){
+        if(!is_last_page){
             fprintf(fout, "\n%%%%%%\n\n");
         }
     }
 
     destroy_page(page);     //columns get destroyed too
 
-    //NOTE: destroy_word and destroy_row must be called in the previous
-    //functions due to the words/rows being dequeued, implying that 
-    //destroy_page wouldn't call free() on them
-	
+    /*
+        NOTE: destroy_word and destroy_row must be called in the previous
+        functions due to the words/rows being dequeued, implying that 
+        destroy_page wouldn't call free() on them
+    */
+    
     //close output file
     fclose(fout);
 }
