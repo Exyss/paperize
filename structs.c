@@ -11,6 +11,7 @@ Page* init_page(){
     //if malloc hasn't failed
     if(page != NULL){
         page->columns = init_linked_list();
+        page->is_last_page = false;
     }
     return page;
 }

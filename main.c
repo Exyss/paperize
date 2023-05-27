@@ -1,6 +1,7 @@
 #include "queue.h"
 #include "pager.h"
 #include "writer.h"
+#include "string_utils.h"
 
 int main(int argc, char* argv[]) {
 
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]) {
     Queue* pages;
 
     pages = read_pages(INPUT_FILE, COLUMN_AMOUNT, COLUMN_HEIGHT, COLUMN_WIDTH);
-    write_pages(OUTPUT_FILE, pages, INTER_COL_SPACE);
+    write_pages_to_file(OUTPUT_FILE, pages, INTER_COL_SPACE);
     
     return 0;
 }

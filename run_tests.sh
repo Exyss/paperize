@@ -26,8 +26,8 @@ run_test() {
 
     # wc output.txt
     # wc $2
-    # sleep 1
-    
+    sleep 1
+
     let TOTAL_TESTS++
 
 }
@@ -49,7 +49,6 @@ run_test sample_inputs/example3_in.txt expected_outputs/example3_out.txt 3 5 15 
 run_test sample_inputs/example4_in.txt expected_outputs/example4_out.txt 200 5 15 5 false
 run_test sample_inputs/ionut_in.txt expected_outputs/ionut_out.txt 3 40 60 10 false
 run_test sample_inputs/dante_in.txt expected_outputs/dante_out.txt 5 40 20 5 false
-exit
 
 echo ""
 

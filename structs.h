@@ -11,6 +11,7 @@
 // STRUCTS
 typedef struct Page{
     LinkedList* columns;
+    bool is_last_page;
 } Page;
 
 typedef struct Column{

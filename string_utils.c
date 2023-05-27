@@ -1,39 +1,69 @@
 #include "string_utils.h"
+#include <stdio.h>
 
 /*
-    Right-pads the given string with pad_amount spaces
+    Returns a copy of the prefix string concatenated with the suffix string.
+    The two given strings are left unchanged.
+
+    Returns NULL if heap allocation has failed.
 */
-char* right_pad_string(char* str, int pad_amount){
+char* safe_strcat(char* prefix, char* suffix){
+    
+    // +1 for null byte
+    char* new_string = (char*) malloc(strlen(prefix) + strlen(suffix) + 1);
 
-    int str_len = strlen(str);
-    int byte_count = str_len + pad_amount + 1;      // the final \0 must be included
-
-    char* padded_str = (char*) malloc(byte_count);
-
-    //strcpy stops copying after reading the first \0
-    strcpy(padded_str, str);
-
-    for(int i = str_len; i < byte_count-1; i++){
-        *(padded_str + i) = ' ';
+    //if malloc has failed
+    if(new_string != NULL){
+        //copy prefix on the new string and concatenate with suffix
+        strcpy(new_string, prefix);
+        strcat(new_string, suffix);
     }
 
-    *(padded_str + byte_count - 1) = '\0';
-    return padded_str;
+    return new_string;
 }
 
 /*
-    Left-pads the given string with pad_amount spaces
+    Returns a right-padded copy of the string.
+    The given string is left unchanged.
+
+    Returns NULL if allocation has failed or
+    if the given pad_amount is negative
 */
-char* left_pad_string(char* str, int pad_amount){
-    int str_len = strlen(str);
-    int byte_count = str_len + pad_amount + 1;      // the final \0 must be included
+char* right_pad_string(char* str, int pad_amount){
 
-    char* padded_str = (char*) malloc(byte_count);
-
-    for(int i = 0; i < pad_amount; i++){
-        *(padded_str + i) = ' ';
+    if(pad_amount < 0){
+        return NULL;
     }
 
-    strcpy((padded_str + pad_amount), str);
-    return padded_str;
+    char spaces[pad_amount + 1];
+
+    for(int i = 0; i < pad_amount; i++){
+        spaces[i] = ' ';
+    }
+    spaces[pad_amount] = '\0';
+
+    return safe_strcat(str, spaces);
+}
+
+/*
+    Returns a left-padded copy of the string.
+    The given string is left unchanged.
+
+    Returns NULL if allocation has failed or
+    if the given pad_amount is negative
+*/
+char* left_pad_string(char* str, int pad_amount){
+
+    if(pad_amount < 0){
+        return NULL;
+    }
+
+    char spaces[pad_amount + 1];
+
+    for(int i = 0; i < pad_amount; i++){
+        spaces[i] = ' ';
+    }
+    spaces[pad_amount] = '\0';
+
+    return safe_strcat(spaces, str);
 }

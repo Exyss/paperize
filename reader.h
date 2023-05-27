@@ -21,6 +21,7 @@
     Analyzes next_byte in order to calculate
     how many more bytes make up the current
     character.
+    
     Returns 0 if it's an ASCII char,
     1, 2 or 3 if it's an UTF-8 char
 */
@@ -38,6 +39,7 @@ static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHE
     Word has been created (until a '\n',
     a ' ' or a '\t' gets read or until
     MAX_CHARS have been read).
+
     Sets status to READ_SUCCESS or READ_FAIL.
 */
 Word* read_word(FILE* fin, int MAX_CHARS, short* status);

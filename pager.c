@@ -126,6 +126,10 @@ static Page* read_page(FILE* fin, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
         col_count++;
     }
 
+    if(REACHED_EOF){
+        page->is_last_page = true;
+    }
+
     return page;
 }
 
