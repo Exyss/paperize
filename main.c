@@ -2,28 +2,24 @@
 #include "pager.h"
 #include "writer.h"
 #include "string_utils.h"
+#include "args.h"
 
 int main(int argc, char* argv[]) {
 
-    if(argc < 6){
+    Args* args = (Args*) parse_args(argc, argv);
+
+    if(args == NULL){
         printf("Wrong usage! Run %s -h for more informations\n", argv[0]);
         return 1;
     }
-
-    const char* INPUT_FILE = argv[1];
-    char* OUTPUT_FILE;
-    const int COLUMN_AMOUNT = atoi(argv[2]);
-    const int COLUMN_HEIGHT = atoi(argv[3]);
-    const int COLUMN_WIDTH = atoi(argv[4]);
-    const int INTER_COL_SPACE = atoi(argv[5]);
-
-    //default value
-    OUTPUT_FILE = "output.txt";
+    else if(args->PRINT_HELP){
+        printf("HELP MESSAGE\n");
+        return 0;
+    }
 
     Queue* pages;
-
-    pages = read_pages(INPUT_FILE, COLUMN_AMOUNT, COLUMN_HEIGHT, COLUMN_WIDTH);
-    write_pages_to_file(OUTPUT_FILE, pages, INTER_COL_SPACE);
     
+    pages = read_pages(args->INPUT_FILE, args->COLUMN_AMOUNT, args->COLUMN_HEIGHT, args->COLUMN_WIDTH);
+    write_pages_to_file(args->OUTPUT_FILE, pages, args->INTER_COL_SPACE);
     return 0;
 }

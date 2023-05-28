@@ -33,4 +33,13 @@ char* right_pad_string(char* str, int pad_amount);
 */
 char* left_pad_string(char* str, int pad_amount);
 
+/*
+    Converts the given string to the represented
+    positive string
+
+    Returns -1 if the given string is invalid or 
+    represents a negative number
+*/
+int safe_pos_atoi(char* str);
+
 #endif

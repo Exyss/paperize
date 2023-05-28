@@ -10,10 +10,10 @@ run_test() {
     if $7 = true
     then
         printf "Test $1 (par): "
-        ./paperize $1 $3 $4 $5 $6 -p
+        ./paperize $1 -C $3 -H $4 -W $5 -S $6 -p
     else
         printf "Test $1 (not par): "
-        ./paperize $1 $3 $4 $5 $6
+        ./paperize $1 -C $3 -H $4 -W $5 -S $6
     fi
 
     if command diff output.txt $2 &> /dev/null
@@ -26,7 +26,7 @@ run_test() {
 
     # wc output.txt
     # wc $2
-    sleep 1
+    # sleep 1
 
     let TOTAL_TESTS++
 

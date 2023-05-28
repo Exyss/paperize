@@ -87,6 +87,6 @@ void write_page_to_file(FILE* fout, Page* page, int inter_col_space, short* stat
 
     The given pages get DEQUEUED and DESTROYED
 */
-int write_pages_to_file(char* out_filename, Queue* pages, int inter_col_space);
+void write_pages_to_file(char* out_filename, Queue* pages, int inter_col_space);
 
 #endif

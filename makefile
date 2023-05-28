@@ -12,10 +12,11 @@ compile: precompile
 
 precompile:  main data_structs core
 
-main: main.c
+main: main.c args.c
 	$(info )
 	$(info +++ Pre-compiling main file...)
 	gcc -c main.c -o main.o
+	gcc -c args.c -o args.o
 
 data_structs: node.c queue.c linked_list.c
 	$(info )

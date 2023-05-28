@@ -304,7 +304,7 @@ void write_page_to_file(FILE* fout, Page* page, int inter_col_space, short* stat
 
     The given pages get DEQUEUED and DESTROYED
 */
-int write_pages_to_file(char* out_filename, Queue* pages, int inter_col_space){
+void write_pages_to_file(char* out_filename, Queue* pages, int inter_col_space){
 
     FILE* fout;
     Page* page;
@@ -316,7 +316,7 @@ int write_pages_to_file(char* out_filename, Queue* pages, int inter_col_space){
     //open output file
     if ((fout = fopen(out_filename, "w")) == NULL) {
         fprintf(stderr, "Cannot write to out.txt");
-        return 1;
+        // return 1;
     }
 
     while(!is_queue_empty(pages)){

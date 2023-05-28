@@ -1,5 +1,4 @@
 #include "string_utils.h"
-#include <stdio.h>
 
 /*
     Returns a copy of the prefix string concatenated with the suffix string.
@@ -66,4 +65,25 @@ char* left_pad_string(char* str, int pad_amount){
     spaces[pad_amount] = '\0';
 
     return safe_strcat(spaces, str);
+}
+
+/*
+    Converts the given string to the represented
+    positive integer
+
+    Returns -1 if the given string is invalid or 
+    represents a negative number
+*/
+int safe_pos_atoi(char* str){
+    char next_char;
+
+    for(int i = 0; i < strlen(str); i++){
+        next_char = *(str + i); 
+
+        if(next_char < '0' || next_char > '9'){
+            return -1;
+        }
+    }
+
+    return atoi(str);
 }
