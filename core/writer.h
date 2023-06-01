@@ -7,12 +7,12 @@
 #include <unistd.h>
 
 // LOCAL INCLUDES
-#include "linked_list.h"
-#include "string_utils.h"
-#include "queue.h"
-#include "node.h"
-#include "structs.h"
-#include "formatter.h"
+#include "../linked_list.h"
+#include "../string_utils.h"
+#include "../queue.h"
+#include "../node.h"
+#include "../structs.h"
+#include "../formatter.h"
 
 // STATUS FLAGS
 #define FILE_WRITE_SUCCESS 1

@@ -6,7 +6,7 @@
 #include "structs.h"
 #include "stdio.h"
 #include "reader.h"
-#include "writer.h"
+#include "core/writer.h"
 #include "pager.h"
 
 // METHODS

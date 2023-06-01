@@ -25,13 +25,13 @@ data_structs: node.c queue.c linked_list.c
 	gcc -c queue.c -o queue.o
 	gcc -c linked_list.c -o linked_list.o
 
-core: reader.c pager.c formatter.c writer.c structs.c string_utils.c single_process.c multi_process.c
+core: reader.c pager.c formatter.c core/writer.c structs.c string_utils.c single_process.c multi_process.c
 	$(info )
 	$(info +++ Pre-compiling core modules...)
 	gcc -c reader.c -o reader.o
 	gcc -c pager.c -o pager.o
 	gcc -c formatter.c -o formatter.o
-	gcc -c writer.c -o writer.o
+	gcc -c core/writer.c -o writer.o
 	gcc -c structs.c -o structs.o
 	gcc -c string_utils.c -o string_utils.o
 	gcc -c single_process.c -o single_process.o

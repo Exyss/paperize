@@ -81,7 +81,7 @@ static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHE
     Reads the file byte-by-byte until a full
     Word has been read or MAX_CHARS have been read
 
-    Sets status to FILE_READ_SUCCESS or READ_FAIL.
+    Sets status to FILE_READ_SUCCESS or FILE_READ_FAIL.
 */
 Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
     
@@ -152,11 +152,7 @@ Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
         }
     }
 
-    /*
-        EOF is returned when end of file has been reached
-        or when an error occurred
-        => must check if an error occurred
-    */
+    //check if errors have occurred
     if(ferror(fin) != 0){
         *status = FILE_READ_FAIL;
         return NULL;
@@ -217,6 +213,7 @@ char* read_string_from_pipe(int fd_in, short* status){
     };
 
     str = (char*) malloc(str_len);
+
 
     if(read(fd_in, str, str_len) == -1 ||
        read(fd_in, &close_pipe, sizeof(bool)) == -1){
