@@ -1,8 +1,5 @@
-#include "queue.h"
-#include "pager.h"
-#include "writer.h"
-#include "string_utils.h"
-#include "args.h"
+#include "single_process.h"
+#include "multi_process.h"
 
 int main(int argc, char* argv[]) {
 
@@ -17,9 +14,10 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    Queue* pages;
-    
-    pages = read_pages(args->INPUT_FILE, args->COLUMN_AMOUNT, args->COLUMN_HEIGHT, args->COLUMN_WIDTH);
-    write_pages_to_file(args->OUTPUT_FILE, pages, args->INTER_COL_SPACE);
-    return 0;
+    if(args->USE_PARALLEL_MODE){
+        return run_multi_process(args);
+    }
+    else{
+        return run_single_process(args);
+    }
 }

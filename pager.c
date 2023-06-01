@@ -8,7 +8,7 @@ bool USE_LAST_ROW = false;
 bool REACHED_EOF = false;
 bool REACHED_EOL = false;
 
-static Row* read_row(FILE* fin, int MAX_CHARS){
+static Row* get_row(FILE* fin, int fd_in, bool get_from_pipe, int MAX_CHARS){
     
     Row* row;
     Word* next_word;
@@ -27,7 +27,12 @@ static Row* read_row(FILE* fin, int MAX_CHARS){
             USE_LAST_WORD = false;
         }
         else{
-            next_word = read_word(fin, MAX_CHARS, &read_status);
+            if(!get_from_pipe){
+                next_word = read_word_from_file(fin, MAX_CHARS, &read_status);
+            }
+            else if(!REACHED_EOF){
+                next_word = read_word_from_pipe(fd_in, &read_status);
+            }
 
             //avoid reading \n followed by \n
             if(last_word != NULL && next_word->char_count == 0
@@ -63,7 +68,7 @@ static Row* read_row(FILE* fin, int MAX_CHARS){
     return row;
 }
 
-static Column* read_column(FILE* fin, int MAX_ROWS, int MAX_CHARS){
+static Column* get_column(FILE* fin, int fd_in, bool get_from_pipe, int MAX_ROWS, int MAX_CHARS){
     
     Column* column = init_column(MAX_ROWS);
     Row* next_row;
@@ -77,7 +82,7 @@ static Column* read_column(FILE* fin, int MAX_ROWS, int MAX_CHARS){
             USE_LAST_ROW = false;
         }
         else{
-            next_row = read_row(fin, MAX_CHARS);
+            next_row = get_row(fin, fd_in, get_from_pipe, MAX_CHARS);
         }
         
         //store row
@@ -85,7 +90,6 @@ static Column* read_column(FILE* fin, int MAX_ROWS, int MAX_CHARS){
 
         if(is_queue_full(column->rows)){
             USE_LAST_ROW = true;
-            REACHED_EOF = false;
             break;
         }
 
@@ -110,10 +114,11 @@ static Column* read_column(FILE* fin, int MAX_ROWS, int MAX_CHARS){
             }
         }
     }
+
     return column;
 }
 
-static Page* read_page(FILE* fin, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
+static Page* get_page(FILE* fin, int fd_in, bool get_from_pipe, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
     
     Page* page = init_page(MAX_COLS);
     Column* col;
@@ -121,7 +126,7 @@ static Page* read_page(FILE* fin, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
     int col_count = 0;
 
     while(!REACHED_EOF && col_count < MAX_COLS){
-        col = read_column(fin, MAX_ROWS, MAX_CHARS);
+        col = get_column(fin, fd_in, get_from_pipe, MAX_ROWS, MAX_CHARS);
         insert_in_list(page->columns, col);
         col_count++;
     }
@@ -133,30 +138,11 @@ static Page* read_page(FILE* fin, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
     return page;
 }
 
-Queue* read_pages(const char* in_filename, int COLUMN_AMOUNT, int COLUMN_HEIGHT, int COLUMN_WIDTH){
 
-    FILE* fin;
-    Queue* pages;
-    Page* page; 
-    short q_status;
+Page* get_page_from_file(FILE* fin, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
+    return get_page(fin, -1, false, MAX_COLS, MAX_ROWS, MAX_CHARS);
+}
 
-    pages = init_queue(INT_MAX);
-
-    //open output file
-    if ((fin = fopen(in_filename, "r")) == NULL) {
-        fprintf(stderr, "Cannot read from input.txt");
-        // return 1;
-    }
-    
-    //read pages until file EOF is reached
-    while(!REACHED_EOF){
-
-        page = read_page(fin, COLUMN_AMOUNT, COLUMN_HEIGHT, COLUMN_WIDTH);
-        enqueue(pages, page, &q_status);
-    }
-
-    //close output file
-    fclose(fin);
-
-    return pages;
+Page* get_page_from_pipe(int fd_in, int MAX_COLS, int MAX_ROWS, int MAX_CHARS){
+    return get_page(NULL, fd_in, true, MAX_COLS, MAX_ROWS, MAX_CHARS);
 }

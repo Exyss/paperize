@@ -81,4 +81,9 @@ void destroy_column(Column* column);
 */
 void destroy_page(Page* page);
 
+/*
+    Returns true if all the columns of the given page have no rows left
+*/
+bool are_all_cols_empty(Page* page);
+
 #endif

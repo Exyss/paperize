@@ -128,3 +128,23 @@ void destroy_page(Page* page){
     free(page->columns);
     free(page);
 }
+
+/*
+    Returns true if all the columns of the given page have no rows left
+*/
+bool are_all_cols_empty(Page* page){
+
+    Column* col;
+    Node* node = page->columns->head;
+
+    while(node != NULL){
+        col = node->data_ptr;
+        if(!is_queue_empty(col->rows)){
+            return false;
+        }
+
+        node = node->next;
+    }
+
+    return true;
+}

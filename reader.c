@@ -56,7 +56,7 @@ static short get_bytes_to_read(int next_byte){
 
 /*
     Creates and fills a Word with the given data.
-    The given max-size stack buffer gets coverted
+    The given max-size stack buffer gets converted
     to a perfect-sized heap buffer.
 */
 static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHED_EOL, bool REACHED_EOF){
@@ -79,12 +79,11 @@ static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHE
 
 /*
     Reads the file byte-by-byte until a full
-    Word has been created (until a '\n',
-    a ' ' or a '\t' gets read or until
-    MAX_CHARS have been read).
-    Sets status to READ_SUCCESS or READ_FAIL.
+    Word has been read or MAX_CHARS have been read
+
+    Sets status to FILE_READ_SUCCESS or READ_FAIL.
 */
-Word* read_word(FILE* fin, int MAX_CHARS, short* status){
+Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
     
     /*
     worst case: all row chars are UTF-8 (max 4 bytes per UTF-8 char), +1 for \0
@@ -159,7 +158,7 @@ Word* read_word(FILE* fin, int MAX_CHARS, short* status){
         => must check if an error occurred
     */
     if(ferror(fin) != 0){
-        *status = READ_FAIL;
+        *status = FILE_READ_FAIL;
         return NULL;
     }
 
@@ -167,6 +166,72 @@ Word* read_word(FILE* fin, int MAX_CHARS, short* status){
     REACHED_EOF = (next_byte == EOF);
 
     Word* word = pack_word(buffer, byte_count, char_count, REACHED_EOL, REACHED_EOF);
-    *status = READ_SUCCESS;
+    *status = FILE_READ_SUCCESS;
     return word;
+}
+
+Word* read_word_from_pipe(int fd_in, short* status){
+
+    Word* word;
+
+    int str_len;
+    char* str;
+    int char_count;
+    bool REACHED_EOL;
+    bool REACHED_EOF;
+    
+    word = NULL;
+
+    if(read(fd_in, &str_len, sizeof(int)) == -1){
+        // return -1;
+    };
+
+    str = (char*) malloc(str_len);
+
+    if(read(fd_in, str, str_len) == -1 ||
+       read(fd_in, &char_count, sizeof(int)) == -1 ||
+       read(fd_in, &REACHED_EOL, sizeof(bool)) == -1 ||
+       read(fd_in, &REACHED_EOF, sizeof(bool)) == -1){
+        
+        //read() returns -1 if an error occurred
+        // *status = PIPE_READ_FAIL;
+    }
+    else{
+        word = init_word(str, char_count, REACHED_EOL, REACHED_EOF);
+        // *status = PIPE_READ_SUCCESS;
+    }
+
+    return word;
+}
+
+char* read_string_from_pipe(int fd_in, short* status){
+
+    int str_len;
+    char* str;
+    bool close_pipe;
+    
+    str = NULL;
+
+    if(read(fd_in, &str_len, sizeof(int)) == -1){
+        // return -1;
+    };
+
+    str = (char*) malloc(str_len);
+
+    if(read(fd_in, str, str_len) == -1 ||
+       read(fd_in, &close_pipe, sizeof(bool)) == -1){
+        
+        //read() returns -1 if an error occurred
+        *status = PIPE_READ_FAIL;
+    }
+    else{
+        if(close_pipe){
+            *status = PIPE_READ_TERMINATED;
+        }
+        else{
+            *status = PIPE_READ_SUCCESS;
+        }
+    }
+
+    return str;
 }

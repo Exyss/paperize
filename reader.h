@@ -12,8 +12,11 @@
 #include "structs.h"
 
 // STATUS CODES
-#define READ_SUCCESS 0
-#define READ_FAIL 1
+#define FILE_READ_SUCCESS 1
+#define PIPE_READ_SUCCESS 2 
+#define PIPE_READ_TERMINATED 3
+#define FILE_READ_FAIL -1
+#define PIPE_READ_FAIL -2
 
 // METHODS
 
@@ -42,6 +45,10 @@ static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHE
 
     Sets status to READ_SUCCESS or READ_FAIL.
 */
-Word* read_word(FILE* fin, int MAX_CHARS, short* status);
+Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status);
+
+char* read_string_from_pipe(int fd_in, short* status);
+
+Word* read_word_from_pipe(int fd_in, short* status);
 
 #endif
