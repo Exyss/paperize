@@ -2,6 +2,7 @@
 
 /*
     Creates a new Queue and returns it's pointer.
+
     Returns NULL if heap allocation has failed
 */
 Queue* init_queue(int MAX_SIZE){
@@ -43,8 +44,8 @@ bool is_queue_full(Queue* queue){
 
 /*
     Returns the data_ptr of the head of the given 
-    queue without removing it from the queue
-    (returns NULL if the queue is empty)
+    queue without removing it from the queue or
+    NULL if the queue is empty
 */
 void* peek_queue(Queue* queue){
     if(!is_queue_empty(queue)){
@@ -58,17 +59,26 @@ void* peek_queue(Queue* queue){
 /*
     Creates a node containing the given data_ptr
     and appends it to the given queue.
-    Sets status to ENQUEUE_SUCCESS or ENQUEUE_FAIL
+
+    Sets status to ENQUEUE_SUCCESS, QUEUE_IS_FULL
+    or ENQUEUE_ALLOCATION_ERROR
 */
 void enqueue(Queue* queue, void* data_ptr, short* status){
+
     if(is_queue_full(queue)){
-        *status = ENQUEUE_FAIL;
+        *status = QUEUE_IS_FULL;
         return;
     }
 
-    //create new node
+    //create new node and check if initialization has failed
     Node* node = init_node(data_ptr);
 
+    if(node == NULL){
+        *status = ENQUEUE_ALLOCATION_ERROR;
+        return;
+    }
+
+    //enqueue node
     if(is_queue_empty(queue)){
         //set new node both as head and tail
         queue->head = node;
@@ -86,21 +96,18 @@ void enqueue(Queue* queue, void* data_ptr, short* status){
 
 /*
     Returns the data_ptr of the head of the given 
-    queue and removes it from the queue
-    (returns NULL if the queue is empty).
-    Sets status to DEQUEUE_SUCCESS or DEQUEUE_FAIL
+    queue and removes it from the queue or NULL
+    if the queue is empty.
+
+    Sets status to DEQUEUE_SUCCESS or QUEUE_IS_EMPTY
 */
 void* dequeue(Queue* queue, short* status){
 
-    //use a status flag in order to avoid accessing NULL value from caller
     if(is_queue_empty(queue)){
-        *status = DEQUEUE_FAIL;
-        return 0;
+        *status = QUEUE_IS_EMPTY;
+        return NULL;
     }
 
-    *status = true;
-
-    
     //update queue head and free the old head
     Node* old_head = queue->head;
     void* old_head_data_ptr = old_head->data_ptr;

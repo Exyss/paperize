@@ -80,16 +80,30 @@ void write_page_to_file(FILE* fout, Page* page, int inter_col_space, short* stat
 
     while((all_columns_empty = are_all_cols_empty(page)) == false){
 
-        write_str = format_page_row(page, inter_col_space);
-
-        //TODO manage errors for format_page_row
+        write_str = format_page_string(page, inter_col_space, status);
+        
+        if(*status != FORMATTING_SUCCESS){
+            destroy_page(page);
+            return;
+        }
 
         write_string_to_file(fout, write_str, status);
+        
         free(write_str);
+
+        if(*status == FILE_WRITE_FAIL){
+            destroy_page(page);
+            return;
+        }
     }
     
     if(!page->is_last_page){
         write_string_to_file(fout, "\n%%%\n\n", status);
+
+        if(*status == FILE_WRITE_FAIL){
+            destroy_page(page);
+            return;
+        }
     }
 
     destroy_page(page);
@@ -111,12 +125,20 @@ void write_page_to_pipe(int fd_out, Page* page, int inter_col_space, short* stat
 
     while((all_columns_empty = are_all_cols_empty(page)) == false){
 
-        write_str = format_page_row(page, inter_col_space);
+        write_str = format_page_string(page, inter_col_space, status);
 
-        //TODO manage errors for format_page_row
+        if(*status != FORMATTING_SUCCESS){
+            destroy_page(page);
+            return;
+        }
 
         write_string_to_pipe(fd_out, write_str, false, status);
         free(write_str);
+
+        if(*status == PIPE_WRITE_FAIL){
+            destroy_page(page);
+            return;
+        }
     }
     
     if(!page->is_last_page){
@@ -125,6 +147,6 @@ void write_page_to_pipe(int fd_out, Page* page, int inter_col_space, short* stat
     else{
         write_string_to_pipe(fd_out, "", true, status);
     }
-
+    
     destroy_page(page);
 }

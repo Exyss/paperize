@@ -3,10 +3,16 @@
 /*
     Parses the given program arguments
 
-    Sets status to INTEGER_PARSE_SUCCESS or INTEGER_PARSE_FAIL
+    Returns NULL if allocation or parsing has failed
 */
 Args* parse_args(int argc, char* argv[]){
     Args* args = (Args*) malloc(sizeof(Args));
+
+    // if malloc has failed
+    if(args == NULL){
+        return NULL;
+    }
+
     int parsed_int;
 
     args->PROGRAM_NAME = argv[0];
@@ -35,9 +41,11 @@ Args* parse_args(int argc, char* argv[]){
         else if(i+1 < argc){
             parsed_int = safe_pos_atoi(argv[i+1]);
 
-            // (sadly) switch cases can't be used with strings
+            // Check if the current argument is a valid flag
+            // and then check parsed_int value (this control MUST be
+            // done afterwards)
             if(strcmp(argv[i], "-C") == 0 || strcmp(argv[i], "--columns") == 0){
-
+                
                 if(parsed_int == -1){
                     free(args);
                     return NULL;

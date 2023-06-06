@@ -2,6 +2,7 @@
 
 /*
     Creates a new LinkedList and returns it's pointer
+
     Returns NULL if heap allocation has failed
 */
 LinkedList* init_linked_list(){
@@ -19,13 +20,21 @@ LinkedList* init_linked_list(){
 /*  
     Creates a node containing the given data_ptr
     and appends it to the given list.
+
+    Returns True if insertion was successful,
+    False if insertion failed
 */
-void insert_in_list(LinkedList* list, void* data_ptr){
+bool insert_in_list(LinkedList* list, void* data_ptr){
 
     //create new node
     Node* node = init_node(data_ptr);
 
-    //if head is NULL, this node becomes the head
+    //check if initialization has failed
+    if(node == NULL){
+        return false;
+    }
+
+    //if head is NULL, the new node becomes the head
     if(list->head == NULL){
         list->head = node;
     }
@@ -38,4 +47,6 @@ void insert_in_list(LinkedList* list, void* data_ptr){
 
         next->next = node;
     }
+
+    return true;
 }

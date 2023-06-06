@@ -21,16 +21,12 @@ typedef struct Args{
     bool PRINT_HELP;
 } Args;
 
-// STATUS CODES
-#define INTEGER_PARSE_SUCCESS 0
-#define INTEGER_PARSE_FAIL 1
-
 // METHODS
 
 /*
     Parses the given program arguments
 
-    Returns NULL if parsing failed
+    Returns NULL if allocation or parsing has failed
 */
 Args* parse_args(int argc, char* argv[]);
 

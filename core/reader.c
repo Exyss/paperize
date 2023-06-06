@@ -4,6 +4,7 @@
     Analyzes next_byte in order to calculate
     how many more bytes make up the current
     character.
+    
     Returns 0 if it's an ASCII char,
     1, 2 or 3 if it's an UTF-8 char
 */
@@ -58,32 +59,56 @@ static short get_bytes_to_read(int next_byte){
     Creates and fills a Word with the given data.
     The given max-size stack buffer gets converted
     to a perfect-sized heap buffer.
+
+    Returns NULL if an error has occurred
+
+    In case of error, sets status to WORD_INIT_FAIL or STRING_ALLOC_FAIL
 */
-static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHED_EOL, bool REACHED_EOF){
-    
+static Word* pack_word(char* buffer, int byte_count, int char_count, bool REACHED_EOL, bool REACHED_EOF, short* status){
+    Word* word;
+    char* str;
+
     //signal word end for strcpy (see below)
     buffer[byte_count] = '\0';
     byte_count++;
 
+    str = (char*) malloc(byte_count);
+
+    //if malloc has failed
+    if(str == NULL){
+        *status = STRING_ALLOC_FAIL;
+        return NULL;
+    }
+
     /*
         strcpy stops copying after reading the first \0
-        => we get a perfect sized string in the heap
-            while the bloated string in stack gets reused
+        => we get a perfect sized string in the heap while
+           the bloated buffer in the stack gets reused
     */
-    char* str = (char*) malloc(byte_count);
     strcpy(str, buffer);
 
-    Word* word = init_word(str, char_count, REACHED_EOL, REACHED_EOF);
+    word = init_word(str, char_count, REACHED_EOL, REACHED_EOF);
+
+    //if initialization has failed
+    if(word == NULL){
+        *status = WORD_INIT_FAIL;
+        free(str);
+        return NULL;
+    }
+
     return word;
 }
 
 /*
     Reads the file byte-by-byte until a full
-    Word has been read or MAX_CHARS have been read
+    Word has been read or max_chars have been read
+    
+    Returns NULL if an error occurred
 
-    Sets status to FILE_READ_SUCCESS or FILE_READ_FAIL.
+    In case of success, sets status to FILE_READ_SUCCESS.
+    In case of error, sets status to FILE_READ_FAIL, WORD_INIT_FAIL or STRING_ALLOC_FAIL
 */
-Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
+Word* read_word_from_file(FILE* fin, int max_chars, short* status){
     
     /*
     worst case: all row chars are UTF-8 (max 4 bytes per UTF-8 char), +1 for \0
@@ -92,10 +117,8 @@ Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
             due to too much malloc() and free() calls (also, the stack gets
             cleared once a word has been read, meaning the same bytes would be reused)
     */
-    
-    const int MAX_BUFFER = MAX_CHARS * 4 + 1;
-
-    char buffer[MAX_BUFFER];
+    char buffer[max_chars * 4 + 1];
+    Word* word;
 
     //DO NOT use char type for next_byte (conflict with UTF-8 chars)
     short next_byte;
@@ -146,13 +169,16 @@ Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
 
             //this control can't be inserted in AND with the while condition
             //since the next byte would get read
-            if(char_count >= MAX_CHARS){
+            if(char_count >= max_chars){
                 break;
             }
         }
     }
 
     //check if errors have occurred
+    // => fgetc() returns EOF if an error occurred,
+    //    meaning the while would be terminated instantly
+
     if(ferror(fin) != 0){
         *status = FILE_READ_FAIL;
         return NULL;
@@ -161,11 +187,25 @@ Word* read_word_from_file(FILE* fin, int MAX_CHARS, short* status){
     //check if EOF has been reached
     REACHED_EOF = (next_byte == EOF);
 
-    Word* word = pack_word(buffer, byte_count, char_count, REACHED_EOL, REACHED_EOF);
+    word = pack_word(buffer, byte_count, char_count, REACHED_EOL, REACHED_EOF, status);
+
+    if(word == NULL){
+        //status already gets set by pack_word()
+        return NULL;
+    }
+    
     *status = FILE_READ_SUCCESS;
     return word;
 }
 
+/*
+    Reads the next word from the given pipe
+
+    Returns NULL if an error occurred
+
+    In case of success, sets status to PIPE_READ_SUCCESS
+    In case of error, sets status to PIPE_READ_FAIL, WORD_INIT_FAIL or STRING_ALLOC_FAIL
+*/
 Word* read_word_from_pipe(int fd_in, short* status){
 
     Word* word;
@@ -179,27 +219,47 @@ Word* read_word_from_pipe(int fd_in, short* status){
     word = NULL;
 
     if(read(fd_in, &str_len, sizeof(int)) == -1){
-        // return -1;
+        *status = PIPE_READ_FAIL;
+        return NULL;
     };
 
     str = (char*) malloc(str_len);
+
+    //if allocation has failed
+    if(str == NULL){
+        *status = STRING_ALLOC_FAIL;
+        return NULL;
+    }
 
     if(read(fd_in, str, str_len) == -1 ||
        read(fd_in, &char_count, sizeof(int)) == -1 ||
        read(fd_in, &REACHED_EOL, sizeof(bool)) == -1 ||
        read(fd_in, &REACHED_EOF, sizeof(bool)) == -1){
         
-        //read() returns -1 if an error occurred
-        // *status = PIPE_READ_FAIL;
+        *status = PIPE_READ_FAIL;
     }
     else{
         word = init_word(str, char_count, REACHED_EOL, REACHED_EOF);
-        // *status = PIPE_READ_SUCCESS;
+
+        if(word == NULL){
+            *status = WORD_INIT_FAIL;
+            free(str);
+            return NULL;
+        }
     }
 
+    *status = PIPE_READ_SUCCESS;
     return word;
 }
 
+/*
+    Reads the next string from the given pipe
+
+    Returns NULL if an error occurred
+
+    In case of success, sets status to PIPE_READ_SUCCESS or PIPE_READ_TERMINATED
+    In case of error, sets status to PIPE_READ_FAIL or STRING_ALLOC_FAIL
+*/
 char* read_string_from_pipe(int fd_in, short* status){
 
     int str_len;
@@ -209,25 +269,23 @@ char* read_string_from_pipe(int fd_in, short* status){
     str = NULL;
 
     if(read(fd_in, &str_len, sizeof(int)) == -1){
-        // return -1;
+        *status = PIPE_READ_FAIL;
     };
 
     str = (char*) malloc(str_len);
 
+    //if allocation has failed
+    if(str == NULL){
+        *status = STRING_ALLOC_FAIL;
+        return NULL;
+    }
 
     if(read(fd_in, str, str_len) == -1 ||
        read(fd_in, &close_pipe, sizeof(bool)) == -1){
-        
-        //read() returns -1 if an error occurred
         *status = PIPE_READ_FAIL;
     }
     else{
-        if(close_pipe){
-            *status = PIPE_READ_TERMINATED;
-        }
-        else{
-            *status = PIPE_READ_SUCCESS;
-        }
+        *status = (close_pipe) ? PIPE_READ_TERMINATED : PIPE_READ_SUCCESS;
     }
 
     return str;

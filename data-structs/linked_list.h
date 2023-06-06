@@ -15,7 +15,8 @@ typedef struct LinkedList {
 // METHODS
 
 /*
-    Creates a new LinkedList and returns it's pointer.
+    Creates a new LinkedList and returns it's pointer
+
     Returns NULL if heap allocation has failed
 */
 LinkedList* init_linked_list();
@@ -23,7 +24,10 @@ LinkedList* init_linked_list();
 /*  
     Creates a node containing the given data_ptr
     and appends it to the given list.
+
+    Returns True if insertion was successful,
+    False if insertion failed
 */
-void insert_in_list(LinkedList* list, void* data_ptr);
+bool insert_in_list(LinkedList* list, void* data_ptr);
 
 #endif

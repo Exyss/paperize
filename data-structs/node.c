@@ -2,6 +2,7 @@
 
 /*
     Creates a new Node and returns it's pointer
+    
     Returns NULL if heap allocation has failed
 */
 Node* init_node(void* data_ptr){

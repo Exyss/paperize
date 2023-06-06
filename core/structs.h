@@ -5,8 +5,8 @@
 #include <limits.h>
 
 // LOCAL INCLUDES
-#include "queue.h"
-#include "linked_list.h"
+#include "../data-structs/queue.h"
+#include "../data-structs/linked_list.h"
 
 // STRUCTS
 typedef struct Page{
@@ -21,7 +21,7 @@ typedef struct Column{
 typedef struct Row{
     Queue* words;
     int char_count;
-    int MAX_CHARS;
+    int max_chars;
 } Row;
 
 typedef struct Word{
@@ -39,48 +39,57 @@ typedef struct Word{
 
 /*
     Creates a new Page and returns it's pointer
+
     Returns NULL if heap allocation has failed
 */
 Page* init_page();
 
 /*
     Creates a new Column and returns it's pointer
+
     Returns NULL if heap allocation has failed
 */
 Column* init_column(int MAX_ROWS);
 
 /*
     Creates a new Row and returns it's pointer
+
     Returns NULL if heap allocation has failed
 */
-Row* init_row(int MAX_CHARS);
-
+Row* init_row(int max_chars);
 /*
     Creates a new Word and returns it's pointer
+
     Returns NULL if heap allocation has failed
 */
 Word* init_word(char* str, int char_count, bool REACHED_EOL, bool REACHED_EOF);
 
 /*
-    Completely de-allocates the given word
+    Completely de-allocates the given word and it's inner components
 */
 void destroy_word(Word* word);
+/*
+    Completely de-allocates the given row and it's inner components
+
+    Returns True if no error occurred, False de-allocation partially
+    or completely failed (inner objects may still be allocated)
+*/
+bool destroy_row(Row* row);
+/*
+    Completely de-allocates the given column and it's inner components
+
+    Returns True if no error occurred, False de-allocation partially
+    or completely failed (inner objects may still be allocated)
+*/
+bool destroy_column(Column* column);
 
 /*
-    Completely de-allocates the given row
-*/
-void destroy_row(Row* row);
+    Completely de-allocates the given page and it's inner components
 
-/*
-    Completely de-allocates the given column
+    Returns True if no error occurred, False de-allocation partially
+    or completely failed (inner objects may still be allocated)
 */
-void destroy_column(Column* column);
-
-/*
-    Completely de-allocates the given page
-*/
-void destroy_page(Page* page);
-
+bool destroy_page(Page* page);
 /*
     Returns true if all the columns of the given page have no rows left
 */
