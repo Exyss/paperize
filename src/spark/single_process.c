@@ -61,7 +61,7 @@ int run_single_process(Args* args){
     if((fout = fopen(args->OUTPUT_FILE, "w")) == NULL) {
         return FILE_OPEN_FAIL;
     }
-
+    
     while(!is_queue_empty(pages)){
         page = (Page*) dequeue(pages, &q_status);
 
@@ -69,11 +69,16 @@ int run_single_process(Args* args){
             return PAGE_DEQUEUE_FAIL;
         }
 
+
         write_page_to_file(fout, page, args->INTER_COL_SPACE, &program_status);
-    
+        
         if(program_status != FILE_WRITE_SUCCESS){
+            
+            //do not update error
+            fclose(fout);
             return program_status;
         }
+
     }
     
     //close output file

@@ -227,11 +227,10 @@ char* format_page_string(Page* page, int inter_col_space, short* status){
                 return NULL;
             }
 
-            next_row = (Row*) peek_queue(col->rows);    //peek doesn't dequeue
-
             //if there is another row
-            if(next_row != NULL){
+            if(!is_queue_empty(col->rows)){
                 //justify only if the next row is not empty
+                next_row = (Row*) peek_queue(col->rows);    //peek doesn't dequeue
                 apply_justification = (next_row->char_count != 0);
             }
             //if it's the last row of the last column of the last page

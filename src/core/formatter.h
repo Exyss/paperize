@@ -8,12 +8,12 @@
 #include <stdbool.h>
 
 // LOCAL INCLUDES
+#include "../data_structs/linked_list.h"
+#include "../data_structs/queue.h"
+#include "../data_structs/node.h"
 #include "../core/status_codes.h"
-#include "../data-structs/linked_list.h"
-#include "../data-structs/queue.h"
-#include "../data-structs/node.h"
+#include "../core/page_structs.h"
 #include "../utils/string_utils.h"
-#include "../core/structs.h"
 
 // METHODS
 

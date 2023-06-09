@@ -5,8 +5,8 @@
 #include <limits.h>
 
 // LOCAL INCLUDES
-#include "../data-structs/queue.h"
-#include "../data-structs/linked_list.h"
+#include "../data_structs/queue.h"
+#include "../data_structs/linked_list.h"
 
 // STRUCTS
 typedef struct Page{

@@ -10,10 +10,10 @@ run_test() {
     if $7 = true
     then
         printf "Test $1 (par): "
-        ./paperize $1 -C $3 -H $4 -W $5 -S $6 -p
+        ./paperize $1 -c $3 -r $4 -w $5 -s $6 -p
     else
         printf "Test $1 (not par): "
-        ./paperize $1 -C $3 -H $4 -W $5 -S $6
+        ./paperize $1 -c $3 -r $4 -w $5 -s $6
     fi
 
     if command diff output.txt $2 &> /dev/null
@@ -24,8 +24,8 @@ run_test() {
         echo "not passed ❌"
     fi
 
-    # wc output.txt
-    # wc $2
+    # wc -w output.txt
+    # wc -w $2
     # sleep 1
 
     let TOTAL_TESTS++
@@ -49,6 +49,7 @@ run_test sample_inputs/example3_in.txt expected_outputs/example3_out.txt 3 5 15 
 run_test sample_inputs/example4_in.txt expected_outputs/example4_out.txt 200 5 15 5 false
 run_test sample_inputs/ionut_in.txt expected_outputs/ionut_out.txt 3 40 60 10 false
 run_test sample_inputs/dante_in.txt expected_outputs/dante_out.txt 5 40 20 5 false
+run_test sample_inputs/example_readme_in.txt expected_outputs/example_readme_out.txt 3 20 20 10 false
 
 echo ""
 
@@ -69,5 +70,6 @@ run_test sample_inputs/example3_in.txt expected_outputs/example3_out.txt 3 5 15 
 run_test sample_inputs/example4_in.txt expected_outputs/example4_out.txt 200 5 15 5 true
 run_test sample_inputs/ionut_in.txt expected_outputs/ionut_out.txt 3 40 60 10 true
 run_test sample_inputs/dante_in.txt expected_outputs/dante_out.txt 5 40 20 5 true
+run_test sample_inputs/example_readme_in.txt expected_outputs/example_readme_out.txt 3 20 20 10 false
 
 printf "\n[$PASSED_TESTS/$TOTAL_TESTS] tests passed.\n"

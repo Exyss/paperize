@@ -10,7 +10,7 @@
 
 // LOCAL INCLUDES
 #include "../core/status_codes.h"
-#include "structs.h"
+#include "page_structs.h"
 
 // METHODS
 

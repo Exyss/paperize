@@ -99,13 +99,10 @@ void write_page_to_file(FILE* fout, Page* page, int inter_col_space, short* stat
     
     if(!page->is_last_page){
         write_string_to_file(fout, "\n%%%\n\n", status);
-
-        if(*status == FILE_WRITE_FAIL){
-            destroy_page(page);
-            return;
-        }
+        //status gets set by write_string_to_file()
     }
 
+    *status = FILE_WRITE_SUCCESS;
     destroy_page(page);
 }
 

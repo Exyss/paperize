@@ -1,4 +1,4 @@
-#include "structs.h"
+#include "page_structs.h"
 
 /*
     Creates a new Page and returns it's pointer

@@ -3,11 +3,11 @@
 
 // LOCAL INCLUDES
 #include "../core/status_codes.h"
-#include "../utils/args.h"
-#include "../core/structs.h"
+#include "../core/page_structs.h"
 #include "../core/reader.h"
 #include "../core/writer.h"
 #include "../core/pager.h"
+#include "../utils/args.h"
 
 // METHODS
 

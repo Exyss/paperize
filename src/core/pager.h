@@ -9,10 +9,10 @@
 #include <stdio.h>
 
 // LOCAL INCLUDES
+#include "../data_structs/linked_list.h"
+#include "../data_structs/queue.h"
 #include "../core/status_codes.h"
-#include "../data-structs/linked_list.h"
-#include "../data-structs/queue.h"
-#include "../core/structs.h"
+#include "../core/page_structs.h"
 #include "../core/reader.h"
 
 // METHOD

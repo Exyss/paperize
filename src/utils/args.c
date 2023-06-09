@@ -44,7 +44,7 @@ Args* parse_args(int argc, char* argv[]){
             // Check if the current argument is a valid flag
             // and then check parsed_int value (this control MUST be
             // done afterwards)
-            if(strcmp(argv[i], "-C") == 0 || strcmp(argv[i], "--columns") == 0){
+            if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--columns") == 0){
                 
                 if(parsed_int == -1){
                     free(args);
@@ -53,7 +53,7 @@ Args* parse_args(int argc, char* argv[]){
 
                 args->COLUMN_AMOUNT = parsed_int;
             }
-            else if(strcmp(argv[i], "-H") == 0 || strcmp(argv[i], "--height") == 0){
+            else if(strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--rows") == 0){
 
                 if(parsed_int == -1){
                     free(args);
@@ -62,7 +62,7 @@ Args* parse_args(int argc, char* argv[]){
 
                 args->COLUMN_HEIGHT = parsed_int;
             }
-            else if(strcmp(argv[i], "-W") == 0 || strcmp(argv[i], "--width") == 0){
+            else if(strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "--width") == 0){
 
                 if(parsed_int == -1){
                     free(args);
@@ -71,7 +71,7 @@ Args* parse_args(int argc, char* argv[]){
 
                 args->COLUMN_WIDTH = parsed_int;
             }
-            else if(strcmp(argv[i], "-S") == 0 || strcmp(argv[i], "--space") == 0){
+            else if(strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--space") == 0){
 
                 if(parsed_int == -1){
                     free(args);

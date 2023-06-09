@@ -9,7 +9,7 @@
 
 // LOCAL INCLUDES
 #include "../core/status_codes.h"
-#include "../core/structs.h"
+#include "../core/page_structs.h"
 #include "../core/reader.h"
 #include "../core/writer.h"
 #include "../core/pager.h"

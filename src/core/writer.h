@@ -7,13 +7,13 @@
 #include <unistd.h>
 
 // LOCAL INCLUDES
-#include "../core/status_codes.h"
-#include "../data-structs/linked_list.h"
-#include "../data-structs/queue.h"
-#include "../data-structs/node.h"
-#include "../utils/string_utils.h"
-#include "../core/structs.h"
+#include "../data_structs/linked_list.h"
+#include "../data_structs/queue.h"
+#include "../data_structs/node.h"
+#include "../core/page_structs.h"
 #include "../core/formatter.h"
+#include "../core/status_codes.h"
+#include "../utils/string_utils.h"
 
 // METHODS
 
